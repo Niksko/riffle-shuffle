@@ -6,9 +6,10 @@ A tool to splice two videos together, a bit like a riffle shuffle
 
 ### OSX
 
-1. Ensure you have Docker Desktop installed. [Click here to install](https://download.docker.com/mac/stable/Docker.dmg)
+1. Ensure you have Docker Desktop installed. [Click here to download](https://download.docker.com/mac/stable/Docker.dmg). Open the downloaded file and it should prompt you to install 
+Docker desktop.
 2. Open the terminal. Use Command+Spacebar and type 'Terminal', then hit enter
-3. Download this repository. There should be a link in the top right to download as a zip.
+3. Download this repository. [Click here to download](https://github.com/Niksko/riffle-shuffle/archive/master.zip)
 4. Figure out where the zip file downloaded to and go there in Finder.
 5. Unzip the files by double clicking on them in Finder.
 6. Go inside the folder of unzipped files
