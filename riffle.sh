@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-  cat << EOF
-Usage: $(basename "${0}") <first-input-filename> <second-input-filemame> <output-filename>
-
-Riffles two video files together
-
-EOF
-  exit 1
-}
-
-(($# != 3)) && usage
-
 cat << EOF
 Starting to...
 ██████  ███ ███████ ███████ █       ███████
@@ -24,9 +12,11 @@ Starting to...
 █     █ ███ █       █       ███████ ███████
 EOF
 
-first_filename="${1}"
-second_filename="${2}"
-output_filename="${3}"
+basepath="$(dirname $(realpath ${0}))"
+
+first_filename="input/first.mp4"
+second_filename="input/second.mp4"
+output_filename="result.mp4"
 
 output_dir="output"
 output_filepath="${output_dir}/${output_filename}"
@@ -34,15 +24,15 @@ first_frame_dir="${output_dir}/first-frames"
 second_frame_dir="${output_dir}/second-frames"
 result_dir="${output_dir}/result-frames"
 
-mkdir -p "${output_dir}"
-mkdir -p "${first_frame_dir}"
-mkdir -p "${second_frame_dir}"
-mkdir -p "${result_dir}"
+mkdir -p "${basepath}/${output_dir}"
+mkdir -p "${basepath}/${first_frame_dir}"
+mkdir -p "${basepath}/${second_frame_dir}"
+mkdir -p "${basepath}/${result_dir}"
 
-docker run --rm -it -v $(pwd):/workdir linuxserver/ffmpeg -i /workdir/"${first_filename}" "/workdir/${first_frame_dir}/frame%05d.png"
-docker run --rm -it -v $(pwd):/workdir linuxserver/ffmpeg -i /workdir/"${second_filename}" "/workdir/${second_frame_dir}/frame%05d.png"
+docker run --rm -it -v "${basepath}":/workdir linuxserver/ffmpeg -i /workdir/"${first_filename}" "/workdir/${first_frame_dir}/frame%05d.png"
+docker run --rm -it -v "${basepath}":/workdir linuxserver/ffmpeg -i /workdir/"${second_filename}" "/workdir/${second_frame_dir}/frame%05d.png"
 
-number_of_frames=$(ls "${first_frame_dir}" | wc -l)
+number_of_frames=$(ls "${basepath}/${first_frame_dir}" | wc -l)
 
 echo "Found ${number_of_frames} frames"
 
@@ -68,7 +58,7 @@ do
   j=0
   while [ "${j}" -lt "${chunk_size}" ]
   do
-    cp $(printf "${first_frame_dir}/frame%05d.png" "${first_video_frame}") $(printf "${result_dir}/frame%05d.png" "${result_frame}")
+    cp $(printf "${basepath}/${first_frame_dir}/frame%05d.png" "${first_video_frame}") $(printf "${basepath}/${result_dir}/frame%05d.png" "${result_frame}")
     j=$((${j}+1))
     result_frame=$((${result_frame}+1))
     first_video_frame=$((${first_video_frame}+1))
@@ -77,7 +67,7 @@ do
   j=0
   while [ "${j}" -lt "${chunk_size}" ]
   do
-    cp $(printf "${second_frame_dir}/frame%05d.png" "${second_video_frame}") $(printf "${result_dir}/frame%05d.png" "${result_frame}")
+    cp $(printf "${basepath}/${second_frame_dir}/frame%05d.png" "${second_video_frame}") $(printf "${basepath}/${result_dir}/frame%05d.png" "${result_frame}")
     j=$((${j}+1))
     result_frame=$((${result_frame}+1))
     second_video_frame=$((${second_video_frame}+1))
@@ -89,7 +79,7 @@ do
   chunk_size=$((${chunk_size}-1))
 done
 
-docker run --rm -it -v $(pwd):/workdir linuxserver/ffmpeg -r 24 -f image2 -i "/workdir/${result_dir}/frame%05d.png" -vcodec libx264 -crf 25 "/workdir/${output_filepath}"
+docker run --rm -it -v "${basepath}":/workdir linuxserver/ffmpeg -r 24 -f image2 -i "/workdir/${result_dir}/frame%05d.png" -vcodec libx264 -crf 25 "/workdir/${output_filepath}"
 
 cat << EOF
 ██████  ███████ █     █ ███████
